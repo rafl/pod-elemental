@@ -6,10 +6,24 @@ use Moose::Autobox;
 use Pod::Elemental::Element;
 use Pod::Elemental::Element::Command;
 
-my %RANK = do {
-  my $i = 0;
-  map { $_ => $i++ } qw(head1 head2 head3 head4 over item begin for);
-};
+has rank => (
+  is       => 'ro',
+  isa      => 'HashRef',
+  required => 1,
+);
+
+{
+  my %DEFAULT_RANK = do {
+    my $i = 0;
+    map { $_ => $i++ * 10 } qw(head1 head2 head3 head4 over item begin for);
+  };
+
+  override BUILDARGS => sub {
+    my $args = super();
+    $args->{rank} = %DEFAULT_RANK->merge($args->{rank} || {});
+    return $args;
+  };
+}
 
 sub _can_recurse {
   my ($self, $element) = @_;
@@ -19,7 +33,7 @@ sub _can_recurse {
 
 sub _rank_for {
   my ($self, $element) = @_;
-  return $RANK{ $element->command };
+  return $self->rank->{ $element->command };
 }
 
 =method nest_elements
@@ -107,10 +121,10 @@ sub nest_elements {
 
     pop @stack until @stack == 1 or defined $self->_rank_for($stack[-1]);
 
-    my $rank        = $self->_rank_for($element);
-    my $parent_rank = $self->_rank_for($stack[-1]) || 0;
-
     if (@stack > 1) {
+      my $rank        = $self->_rank_for($element);
+      my $parent_rank = $self->_rank_for($stack[-1]) || 0;
+
       if (! $rank) {
         @stack = $top;
       } else {
