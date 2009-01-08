@@ -12,7 +12,8 @@ my $events   = Pod::Eventual::Simple->read_file('t/eg/Simple.pm')
                ->grep(sub { $_->{type} ne 'nonpod' });
 my $elements = Pod::Elemental::Objectifier->objectify_events($events);
 
-Pod::Elemental::Nester->new->nest_elements($elements);
+my $nester = Pod::Elemental::Nester->new({ rank => { method => 1 } });
+$nester->nest_elements($elements);
 
 my $want = [
   {
@@ -44,7 +45,14 @@ my $want = [
   {
     cmd('method'),
     content => "none",
-    children => [ { txt("Nope, there are no methods.") } ],
+    children => [
+      { txt("Nope, there are no methods.") },
+      {
+        cmd('over'),
+        content => '4',
+        children => [map { +{ cmd('item'), content => $_ } } qw/foo bar/],
+      },
+    ],
   },
 
   {

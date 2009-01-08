@@ -24,6 +24,14 @@ This is a test.  How many times do I need to tell you that?
 
 Nope, there are no methods.
 
+=over 4
+
+=item foo
+
+=item bar
+
+=back
+
 =attr also_none
 
 None of these, either.
