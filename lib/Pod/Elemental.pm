@@ -41,16 +41,40 @@ has objectifier => (
 
 =attr nester
 
-The nester (by default a new Pod::Elemental::Nester) provides a
-C<nest_elements> method that, given an array of elements, structures them into
-a tree.
+The nester provides a C<nest_elements> method that, given an array of elements,
+structures them into a tree. Will be constructed using C<nester_class> and
+C<nester_args> if not specified.
 
 =cut
 
 has nester => (
   is       => 'ro',
   required => 1,
-  default  => sub { return Pod::Elemental::Nester->new },
+  lazy     => 1,
+  builder  => '_build_nester',
+);
+
+=attr nester_class
+
+The class to use when constructing C<nester>. Defaults to C<Pod::Elemental::Nester>.
+
+=cut
+
+has nester_class => (
+  is      => 'ro',
+  default => 'Pod::Elemental::Nester',
+);
+
+=attr nester_args
+
+Arguments to pass to the constructor when building C<nester>. Defaults to an
+empty hash reference.
+
+=cut
+
+has nester_args => (
+  is      => 'ro',
+  default => sub { +{} },
 );
 
 =attr document_class
@@ -64,6 +88,11 @@ has document_class => (
   required => 1,
   default  => 'Pod::Elemental::Document',
 );
+
+sub _build_nester {
+    my ($self) = @_;
+    return $self->nester_class->new( $self->nester_args );
+}
 
 =method read_handle
 
