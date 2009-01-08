@@ -14,7 +14,7 @@ my $events   = Pod::Eventual::Simple->read_file('t/eg/nested-begin.pod')
 my $elements = Pod::Elemental::Objectifier->objectify_events($events);
 my $document = Pod::Elemental::Document->new;
 
-Pod::Elemental::Nester->nest_elements($elements);
+Pod::Elemental::Nester->new->nest_elements($elements);
 
 $document->add_elements($elements);
 

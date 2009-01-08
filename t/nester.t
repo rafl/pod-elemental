@@ -12,7 +12,7 @@ my $events   = Pod::Eventual::Simple->read_file('t/eg/Simple.pm')
                ->grep(sub { $_->{type} ne 'nonpod' });
 my $elements = Pod::Elemental::Objectifier->objectify_events($events);
 
-Pod::Elemental::Nester->nest_elements($elements);
+Pod::Elemental::Nester->new->nest_elements($elements);
 
 my $want = [
   {
